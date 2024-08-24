@@ -1,0 +1,10 @@
+c_id     = Category ID            "3162063"
+c_name   = Category Name          "Early Bird Lunch"
+
+i_s_name = Internal Short Name    "early bird lunch wed"
+v_id     = Variant ID             "581013"
+v_name   = Variant Name           "VEG"
+p_id     = Product ID             1256149521
+
+g_name   = Group Name             "Restaurant Menu"
+
