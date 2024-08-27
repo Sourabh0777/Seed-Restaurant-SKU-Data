@@ -61,10 +61,9 @@ export const alreadyExistsIfNotThenCreate = async (tableName: any, where: any, d
     const alreadyExists = await findUniqueRow(tableName, where);
     if (!alreadyExists) {
       const create = await createRow(tableName, data);
-      console.log('🚀 ~ alreadyExistsIfNotThenCreate ~ create:', create);
       return create;
     } else {
-      return;
+      return alreadyExists;
     }
   } catch (error) {
     return error;

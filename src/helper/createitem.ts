@@ -1,5 +1,4 @@
 import prisma from '../config/prisma';
-import { alreadyExistsIfNotThenCreate } from './PrismaFunctions';
 
 export const createItem = async (data: any) => {
   console.log('started');
@@ -14,32 +13,44 @@ export const createItem = async (data: any) => {
           }
 
           // Create Group
-          const group = { group_category_id: parseInt(item.group_category_id), g_name: item_extra_data.g_name };
-          const groupWhere = { group_category_id: parseInt(item.group_category_id) };
-          await alreadyExistsIfNotThenCreate(prisma.restaurant_new_SKU_group, groupWhere, group);
+          const findGroupById = await prisma.restaurant_new_SKU_group.findUnique({ where: { group_category_id: parseInt(item.group_category_id) } });
+          const findGroupByName = await prisma.restaurant_new_SKU_group.findUnique({ where: { g_name: item_extra_data.g_name } });
+          let createGroup;
+          if (!findGroupById && !findGroupByName) {
+            createGroup = await prisma.restaurant_new_SKU_group.create({ data: { group_category_id: parseInt(item_extra_data.group_category_id), g_name: item_extra_data.g_name } });
+          }
 
           // Create restaurant_new_SKU_category
-          const category = { c_id: parseInt(item_extra_data.c_id), c_name: item_extra_data.c_name };
-          const categoryWhere = { c_id: parseInt(item_extra_data.c_id) };
-          await alreadyExistsIfNotThenCreate(prisma.restaurant_new_SKU_category, categoryWhere, category);
+          const findCategoryById = await prisma.restaurant_new_SKU_category.findUnique({ where: { c_id: parseInt(item_extra_data.c_id) } });
+          const findCategoryByName = await prisma.restaurant_new_SKU_category.findUnique({ where: { c_name: item_extra_data.c_name } });
+          let createCategory;
+          if (!findCategoryById && !findCategoryByName) {
+            createCategory = await prisma.restaurant_new_SKU_category.create({ data: { c_id: parseInt(item_extra_data.c_id), c_name: item_extra_data.c_name } });
+          }
 
           // Create restaurant_new_SKU_variants
+          let checkVarientExists;
+          let createVarient;
           if (item_extra_data.v_id !== 0) {
             const variant = { v_id: parseInt(item_extra_data.v_id), v_name: item_extra_data.v_name };
             const variantWhere = { v_id: parseInt(item_extra_data.v_id) };
-            await alreadyExistsIfNotThenCreate(prisma.restaurant_new_SKU_variants, variantWhere, variant);
+            checkVarientExists = await prisma.restaurant_new_SKU_variants.findUnique({ where: variantWhere });
+            if (!checkVarientExists) {
+              createVarient = await prisma.restaurant_new_SKU_variants.create({ data: variant });
+              console.log('🚀 ~ orderData.OrderItem.map ~ createVarient:', createVarient);
+            }
           }
 
           // Create restaurant_new_SKU_items
-          const i_tem = {
+          let i_tem = {
             item_id: parseInt(item.item_id),
             price: parseInt(item.price),
             name: item.name,
             old_item_id: item.old_item_id ? parseInt(item.old_item_id) : null,
             i_s_name: item_extra_data.i_s_name ? item_extra_data.i_s_name : null,
-            c_id: item_extra_data.c_id ? parseInt(item_extra_data.c_id) : null,
-            group_category_id: item.group_category_id ? parseInt(item.group_category_id) : null,
-            v_id: item_extra_data.v_id !== 0 ? item_extra_data.v_id : null,
+            c_id: findCategoryById?.c_id || findCategoryByName?.c_id || createCategory?.c_id,
+            group_category_id: findGroupById?.group_category_id || findGroupByName?.group_category_id || createGroup?.group_category_id,
+            v_id: checkVarientExists?.v_id || createVarient?.v_id,
           };
 
           const itemExistsById = await prisma.restaurant_new_SKU_items.findUnique({

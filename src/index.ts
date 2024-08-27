@@ -15,7 +15,7 @@ const getAllFilePaths = (dir: string) => {
 const app = express();
 app.get('/home', async (req, res) => {
   const filePaths = getAllFilePaths(downloadsDir);
-  const data = await getDataFromFile(filePaths[0]);
+  const data = await getDataFromFile(filePaths[1]);
   const item = await createItem(data);
   return res.send(item);
 });
