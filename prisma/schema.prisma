@@ -30,9 +30,9 @@ model FoodTrialSpoilage {
 }
 
 model Order {
-  id                     Int         @id @default(autoincrement())
+  id                     Int         @id @unique @default(autoincrement())
   restaurantID           Int
-  invoiceID              Int
+  invoiceID              Int         @unique
   paymentTypeID          Int
   orderTypeID            Int
   paymentStatus          String
@@ -54,7 +54,7 @@ model Order {
 }
 
 model OrderItem {
-  id                       Int                       @id @default(autoincrement())
+  id                       Int                       @id @unique @default(autoincrement())
   orderID                  Int
   quantity                 Int?
   createdAt                DateTime                  @default(now())
