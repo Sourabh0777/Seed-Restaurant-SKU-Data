@@ -17,7 +17,7 @@ export const createItem = async (data: any) => {
           const findGroupByName = await prisma.restaurant_new_SKU_group.findUnique({ where: { g_name: item_extra_data.g_name } });
           let createGroup;
           if (!findGroupById && !findGroupByName) {
-            createGroup = await prisma.restaurant_new_SKU_group.create({ data: { group_category_id: parseInt(item_extra_data.group_category_id), g_name: item_extra_data.g_name } });
+            createGroup = await prisma.restaurant_new_SKU_group.create({ data: { group_category_id: parseInt(item.group_category_id), g_name: item_extra_data.g_name } });
           }
 
           // Create restaurant_new_SKU_category
@@ -32,10 +32,9 @@ export const createItem = async (data: any) => {
           let checkVarientExists;
           let createVarient;
           if (item_extra_data.v_id !== 0) {
-            const variant = { v_id: parseInt(item_extra_data.v_id), v_name: item_extra_data.v_name };
-            const variantWhere = { v_id: parseInt(item_extra_data.v_id) };
-            checkVarientExists = await prisma.restaurant_new_SKU_variants.findUnique({ where: variantWhere });
+            checkVarientExists = await prisma.restaurant_new_SKU_variants.findUnique({ where: { v_id: parseInt(item_extra_data.v_id) } });
             if (!checkVarientExists) {
+              const variant = { v_id: parseInt(item_extra_data.v_id), v_name: item_extra_data.v_name };
               createVarient = await prisma.restaurant_new_SKU_variants.create({ data: variant });
               console.log('🚀 ~ orderData.OrderItem.map ~ createVarient:', createVarient);
             }
