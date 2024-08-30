@@ -14,10 +14,15 @@ const getAllFilePaths = (dir: string) => {
 };
 const app = express();
 app.get('/home', async (req, res) => {
-  const filePaths = getAllFilePaths(downloadsDir);
-  const data = await getDataFromFile(filePaths[7]);
-  const item = await createItem(data);
-  return res.send(item);
+  try {
+    const filePaths = getAllFilePaths(downloadsDir);
+    const data = await getDataFromFile(filePaths[6]);
+    const item = await createItem(data);
+    return res.send(item);
+  } catch (error) {
+    console.log('Error Catch');
+    console.log(error);
+  }
 });
 
 app.listen(env.PORT, () => {

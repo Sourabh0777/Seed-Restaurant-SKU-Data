@@ -30,9 +30,9 @@ model FoodTrialSpoilage {
 }
 
 model Order {
-  id                     Int         @id @unique @default(autoincrement())
+  id                     Int           @id @unique @default(autoincrement())
   restaurantID           Int
-  invoiceID              Int         @unique
+  invoiceID              Int           @unique
   paymentTypeID          Int
   orderTypeID            Int
   paymentStatus          String
@@ -49,7 +49,8 @@ model Order {
   CGST                   Float?
   SGST                   Float?
   VAT                    Float?
-  createdAt              DateTime    @default(now())
+  createdAt              DateTime      @default(now())
+  newRestaurant          newRestaurant @relation(fields: [restaurantID], references: [restaurant_id])
   OrderItem              OrderItem[]
 }
 
@@ -59,13 +60,13 @@ model OrderItem {
   quantity                 Int?
   createdAt                DateTime                  @default(now())
   NCFlag                   Boolean                   @default(false)
-  item_id                  BigInt?
+  item_id                  String?
   original_price           Float?
   price                    Float?
   total                    Float?
   total_discount           Float?                    @default(0)
   total_tax                Float?
-  restaurant_new_SKU_items restaurant_new_SKU_items? @relation(fields: [item_id], references: [item_id])
+  restaurant_new_SKU_items restaurant_new_SKU_items? @relation(fields: [item_id], references: [id])
   Order                    Order                     @relation(fields: [orderID], references: [id])
 }
 
@@ -677,38 +678,52 @@ model restaurant_issues {
 }
 
 model restaurant_new_SKU_group {
-  group_category_id BigInt                     @id @unique
-  g_name            String                     @unique
+  group_category_id BigInt
+  g_name            String
+  restaurant_id     Int
+  id                String                     @id @default(uuid())
+  newRestaurant     newRestaurant              @relation(fields: [restaurant_id], references: [restaurant_id])
   item              restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_category {
-  c_id                    BigInt                     @id @unique
-  c_name                  String                     @unique
+  c_id                    BigInt
+  c_name                  String
+  restaurant_id           Int
+  isBuffet                Boolean?
+  meal_type               MealType?
+  id                      String                     @id @default(uuid())
   non_chargeable_sales_v2 non_chargeable_sales_v2[]
+  newRestaurant           newRestaurant              @relation(fields: [restaurant_id], references: [restaurant_id])
   item                    restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_variants {
-  v_id   BigInt                     @id @unique
+  v_id   BigInt
   v_name String?
+  id     String                     @id  @default(uuid())
   item   restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_items {
-  item_id                 BigInt                       @id @unique
+  item_id                 BigInt
   price                   Int
-  name                    String                       @unique
+  name                    String
   old_item_id             BigInt?
   i_s_name                String?
-  c_id                    BigInt?
-  group_category_id       BigInt?
-  v_id                    BigInt?
+  c_id                    String?
+  group_category_id       String?
+  v_id                    String?
+  restaurant_id           Int
+  isAdult                 Boolean?
+  isVeg                   Boolean?
+  id                      String                       @id  @default(uuid())
   OrderItem               OrderItem[]
   non_chargeable_sales_v2 non_chargeable_sales_v2[]
-  category                restaurant_new_SKU_category? @relation(fields: [c_id], references: [c_id])
-  sku_group               restaurant_new_SKU_group?    @relation(fields: [group_category_id], references: [group_category_id])
-  varient                 restaurant_new_SKU_variants? @relation(fields: [v_id], references: [v_id])
+  category                restaurant_new_SKU_category? @relation(fields: [c_id], references: [id])
+  sku_group               restaurant_new_SKU_group?    @relation(fields: [group_category_id], references: [id])
+  newRestaurant           newRestaurant                @relation(fields: [restaurant_id], references: [restaurant_id])
+  varient                 restaurant_new_SKU_variants? @relation(fields: [v_id], references: [id])
 }
 
 model restaurant_permissions {
@@ -1274,7 +1289,7 @@ model non_chargeable_sales_entries_v2 {
 model non_chargeable_sales_v2 {
   id                                                                          String                            @id
   nonChargeableSaleCategoryID                                                 String
-  restaurantSKUItemID                                                         BigInt?
+  restaurantSKUItemID                                                         String?
   storeSKUItemVarintID                                                        String?
   quantity                                                                    Int
   monthIndex                                                                  Int
@@ -1286,15 +1301,23 @@ model non_chargeable_sales_v2 {
   approvedByUserID                                                            String?
   createdAt                                                                   DateTime                          @default(now())
   updatedAt                                                                   DateTime
-  restaurant_new_SKU_categoryC_id                                             BigInt?
+  restaurant_new_SKU_categoryC_id                                             String?
   non_chargeable_sales_entries_v2                                             non_chargeable_sales_entries_v2[]
   restaurant_users_non_chargeable_sales_v2_approvedByUserIDTorestaurant_users restaurant_users?                 @relation("non_chargeable_sales_v2_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
   restaurant_users_non_chargeable_sales_v2_createdByUserIDTorestaurant_users  restaurant_users?                 @relation("non_chargeable_sales_v2_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
   non_chargeable_sale_categories                                              non_chargeable_sale_categories    @relation(fields: [nonChargeableSaleCategoryID], references: [id])
-  restaurant_new_SKU_items                                                    restaurant_new_SKU_items?         @relation(fields: [restaurantSKUItemID], references: [item_id])
-  restaurant_new_SKU_category                                                 restaurant_new_SKU_category?      @relation(fields: [restaurant_new_SKU_categoryC_id], references: [c_id])
+  restaurant_new_SKU_items                                                    restaurant_new_SKU_items?         @relation(fields: [restaurantSKUItemID], references: [id])
+  restaurant_new_SKU_category                                                 restaurant_new_SKU_category?      @relation(fields: [restaurant_new_SKU_categoryC_id], references: [id])
   store_SKU_item_variants                                                     store_SKU_item_variants?          @relation(fields: [storeSKUItemVarintID], references: [id])
   restaurant_users_non_chargeable_sales_v2_updatedByUserIDTorestaurant_users  restaurant_users?                 @relation("non_chargeable_sales_v2_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id], onDelete: Cascade)
+}
+
+model newRestaurant {
+  restaurant_id               Int                           @id @unique
+  Order                       Order[]
+  restaurant_new_SKU_category restaurant_new_SKU_category[]
+  restaurant_new_SKU_group    restaurant_new_SKU_group[]
+  restaurant_new_SKU_items    restaurant_new_SKU_items[]
 }
 
 enum Category {
@@ -1369,4 +1392,10 @@ enum OrderTypeEnum {
   dine_in
   delivery
   pickup
+}
+
+enum MealType {
+  DINNER
+  LUNCH
+  NOT_APPLICABLE
 }
