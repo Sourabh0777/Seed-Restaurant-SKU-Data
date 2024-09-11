@@ -26,5 +26,5 @@ app.get('/home', async (req, res) => {
 });
 
 app.listen(env.PORT, () => {
-  console.log('listening to port 500');
+  console.log(`listening to port ${env.PORT}`);
 });
