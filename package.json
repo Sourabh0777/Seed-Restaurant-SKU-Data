@@ -5,6 +5,7 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "dev": "npm run prettier && nodemon",
+    "seed": "ts-node ./src/Seeder/seed.ts && ts-node ./src/Seeder/seeder-2.ts",
     "fn": " ts-node ./src/read-sqs.ts",
     "start": "npm run build && node ./dist/index.js",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,json,md}\"",

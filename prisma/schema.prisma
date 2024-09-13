@@ -717,13 +717,11 @@ model restaurant_new_SKU_group {
 
 model restaurant_new_SKU_category {
   restaurant_id                   Int
-  isBuffet                        String?
   id                              String                            @id @default(uuid())
-  meal_type                       String?
-  buffetTypeId                    String?
   mealTypeId                      String?
   category_id                     BigInt
   category_name                   String
+  buffetTypeId                    Int?
   non_chargeable_sales_entries_v2 non_chargeable_sales_entries_v2[]
   non_chargeable_sales_v2         non_chargeable_sales_v2[]
   buffetType                      buffetType?                       @relation(fields: [buffetTypeId], references: [id])
@@ -1381,7 +1379,6 @@ model non_chargeable_sales_v2 {
 
 model newRestaurant {
   restaurant_id               Int                           @id @unique
-  isDeleted                   Boolean                       @default(false)
   Order                       Order[]
   OrderItem                   OrderItem[]
   restaurant_new_SKU_category restaurant_new_SKU_category[]
@@ -1390,30 +1387,30 @@ model newRestaurant {
 }
 
 model buffetType {
-  id                          String                        @id
   buffetTypeName              String
-  enabled                     Boolean
+  enabled                     Boolean                       @default(true)
+  id                          Int                           @id
   restaurant_new_SKU_category restaurant_new_SKU_category[]
 }
 
 model customerType {
   id                       String                     @id
   customerTypeName         String
-  enabled                  Boolean
+  enabled                  Boolean                    @default(true)
   restaurant_new_SKU_items restaurant_new_SKU_items[]
 }
 
 model mealType {
   id                          String                        @id
   mealTypeName                String
-  enabled                     Boolean
+  enabled                     Boolean                       @default(true)
   restaurant_new_SKU_category restaurant_new_SKU_category[]
 }
 
 model vegetarianMark {
   id                       String                     @id
   vegetarianMarkType       String
-  enabled                  Boolean
+  enabled                  Boolean                    @default(true)
   restaurant_new_SKU_items restaurant_new_SKU_items[]
 }
 
