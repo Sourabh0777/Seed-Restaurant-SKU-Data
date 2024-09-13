@@ -16,7 +16,7 @@ const app = express();
 app.get('/home', async (req, res) => {
   try {
     const filePaths = getAllFilePaths(downloadsDir);
-    const data = await getDataFromFile(filePaths[6]);
+    const data = await getDataFromFile(filePaths[0]);
     const item = await createItem(data);
     return res.send(item);
   } catch (error) {
@@ -26,5 +26,5 @@ app.get('/home', async (req, res) => {
 });
 
 app.listen(env.PORT, () => {
-  console.log('listening to port 500');
+  console.log(`listening to port ${env.PORT}`);
 });

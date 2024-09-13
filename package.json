@@ -27,7 +27,7 @@
     "lint-staged": "^15.2.7",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
-    "prisma": "^5.17.0",
+    "prisma": "^5.19.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.0.0"
@@ -37,7 +37,7 @@
     "@aws-sdk/client-sqs": "^3.624.0",
     "@aws-sdk/node-http-handler": "^3.374.0",
     "@aws-sdk/s3-request-presigner": "^3.624.0",
-    "@prisma/client": "^5.17.0",
+    "@prisma/client": "^5.19.1",
     "aws-sdk": "^2.1669.0",
     "dotenv": "^16.4.5",
     "envalid": "^8.0.0",
