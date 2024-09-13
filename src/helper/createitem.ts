@@ -24,22 +24,22 @@ export const createItem = async (data: any) => {
 
           // Create Group
           const findGroupById = await prisma.restaurant_new_SKU_group.findFirst({ where: { restaurant_id: restaurantId, group_category_id: parseInt(item.group_category_id) } });
-          const findGroupByName = await prisma.restaurant_new_SKU_group.findFirst({ where: { restaurant_id: restaurantId, g_name: item_extra_data.g_name } });
+          const findGroupByName = await prisma.restaurant_new_SKU_group.findFirst({ where: { restaurant_id: restaurantId, group_name: item_extra_data.g_name } });
           let createGroup;
           if (!findGroupById && !findGroupByName) {
             createGroup = await prisma.restaurant_new_SKU_group.create({
-              data: { group_category_id: parseInt(item.group_category_id), g_name: item_extra_data.g_name, restaurant_id: restaurantId },
+              data: { group_category_id: parseInt(item.group_category_id), group_name: item_extra_data.g_name, restaurant_id: restaurantId },
             });
             console.log('🚀 ~ orderData.OrderItem.map ~ createGroup:', createGroup);
           }
 
           // Create restaurant_new_SKU_category
-          const findCategoryById = await prisma.restaurant_new_SKU_category.findFirst({ where: { restaurant_id: restaurantId, c_id: parseInt(item_extra_data.c_id) } });
-          const findCategoryByName = await prisma.restaurant_new_SKU_category.findFirst({ where: { restaurant_id: restaurantId, c_name: item_extra_data.c_name } });
+          const findCategoryById = await prisma.restaurant_new_SKU_category.findFirst({ where: { restaurant_id: restaurantId, category_id: parseInt(item_extra_data.c_id) } });
+          const findCategoryByName = await prisma.restaurant_new_SKU_category.findFirst({ where: { restaurant_id: restaurantId, category_name: item_extra_data.c_name } });
           let createCategory;
           if (!findCategoryById && !findCategoryByName) {
             createCategory = await prisma.restaurant_new_SKU_category.create({
-              data: { c_id: parseInt(item_extra_data.c_id), c_name: item_extra_data.c_name, restaurant_id: restaurantId },
+              data: { category_id: parseInt(item_extra_data.c_id), category_name: item_extra_data.c_name, restaurant_id: restaurantId },
             });
             console.log('🚀 ~ orderData.OrderItem.map ~ createCategory:', createCategory);
           }
@@ -48,9 +48,9 @@ export const createItem = async (data: any) => {
           let checkVarientExists;
           let createVarient;
           if (item_extra_data.v_id !== 0) {
-            checkVarientExists = await prisma.restaurant_new_SKU_variants.findFirst({ where: { v_id: parseInt(item_extra_data.v_id) } });
+            checkVarientExists = await prisma.restaurant_new_SKU_variants.findFirst({ where: { variant_id: parseInt(item_extra_data.v_id) } });
             if (!checkVarientExists) {
-              const variant = { v_id: parseInt(item_extra_data.v_id), v_name: item_extra_data.v_name };
+              const variant = { variant_id: parseInt(item_extra_data.v_id), variant_name: item_extra_data.v_name };
               createVarient = await prisma.restaurant_new_SKU_variants.create({ data: variant });
               console.log('🚀 ~ orderData.OrderItem.map ~ createVarient:', createVarient);
             }
@@ -72,9 +72,9 @@ export const createItem = async (data: any) => {
                 restaurant_id: restaurantId,
                 old_item_id: parseInt(item.old_item_id),
                 i_s_name: item_extra_data.i_s_name,
-                c_id: findCategoryById?.id || findCategoryByName?.id || createCategory?.id,
+                category_id: findCategoryById?.id || findCategoryByName?.id || createCategory?.id,
                 group_category_id: findGroupById?.id || findGroupByName?.id || createGroup?.id,
-                v_id: checkVarientExists?.id || createVarient?.id,
+                variant_id: checkVarientExists?.id || createVarient?.id,
               },
             });
             console.log('🚀 ~ createdItem:', createdItem);

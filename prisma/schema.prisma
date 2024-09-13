@@ -22,6 +22,7 @@ model FoodTrialSpoilage {
   reason              String?
   vendorName          String
   createdAt           DateTime @default(now())
+  isDeleted           Boolean  @default(false)
 
   @@index([date])
   @@index([itemName])
@@ -49,7 +50,7 @@ model Order {
   CGST                   Float?
   SGST                   Float?
   VAT                    Float?
-  createdAt              DateTime      @default(now())
+  createdAt              DateTime
   newRestaurant          newRestaurant @relation(fields: [restaurantID], references: [restaurant_id])
   OrderItem              OrderItem[]
 }
@@ -66,8 +67,10 @@ model OrderItem {
   total                    Float?
   total_discount           Float?                    @default(0)
   total_tax                Float?
+  restaurantID             Int
   restaurant_new_SKU_items restaurant_new_SKU_items? @relation(fields: [item_id], references: [id])
   Order                    Order                     @relation(fields: [orderID], references: [id])
+  newRestaurant            newRestaurant             @relation(fields: [restaurantID], references: [restaurant_id])
 }
 
 model admin_permissions {
@@ -77,6 +80,7 @@ model admin_permissions {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime
   enabled              Boolean       @default(true)
+  isDeleted            Boolean       @default(false)
   admin_roles          admin_roles[] @relation("admin_permissionsToadmin_roles")
 }
 
@@ -87,6 +91,7 @@ model admin_roles {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime
   enabled           Boolean             @default(true)
+  isDeleted         Boolean             @default(false)
   admin_users       admin_users[]
   admin_permissions admin_permissions[] @relation("admin_permissionsToadmin_roles")
 }
@@ -114,6 +119,7 @@ model admin_users {
   updatedAt                       DateTime
   enabled                         Boolean                           @default(true)
   userType                        String                            @default("admin")
+  isDeleted                       Boolean                           @default(false)
   admin_roles                     admin_roles                       @relation(fields: [admin_rolesId], references: [id])
   document_uploads_tracking_table document_uploads_tracking_table[]
   expense_tally_data_categories   expense_tally_data_categories[]
@@ -155,6 +161,7 @@ model document_uploads_tracking_table {
   updatedAt                                 DateTime
   restaurantID                              String?
   AllFilesDataIsUploaded                    Boolean                                     @default(false)
+  isDeleted                                 Boolean                                     @default(false)
   discount_orders_summary                   discount_orders_summary[]
   admin_users                               admin_users?                                @relation(fields: [adminUserID], references: [id])
   restaurant                                restaurant?                                 @relation(fields: [restaurantID], references: [id])
@@ -181,6 +188,7 @@ model expense_tally_data_categories {
   updatedAt                DateTime
   enabled                  Boolean                    @default(false)
   approvedByUserID         String?
+  isDeleted                Boolean                    @default(false)
   admin_users              admin_users?               @relation(fields: [approvedByUserID], references: [id])
   unit_expenses_tally_data unit_expenses_tally_data[]
 }
@@ -193,6 +201,7 @@ model fileTrackingTables {
   mainTableUpdated                Boolean                          @default(false)
   createdAt                       DateTime                         @default(now())
   updatedAt                       DateTime
+  isDeleted                       Boolean                          @default(false)
   document_uploads_tracking_table document_uploads_tracking_table? @relation(fields: [documentUploadTrackingTableID], references: [id])
 }
 
@@ -216,6 +225,7 @@ model gas_readings {
   approvedByUserID                                                 String?
   monthIndex                                                       Int?
   year                                                             Int?
+  isDeleted                                                        Boolean           @default(false)
   restaurant_users_gas_readings_approvedByUserIDTorestaurant_users restaurant_users? @relation("gas_readings_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_gas_readings_createdByUserIDTorestaurant_users  restaurant_users? @relation("gas_readings_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_users_gas_readings_restaurantUserIDTorestaurant_users restaurant_users  @relation("gas_readings_restaurantUserIDTorestaurant_users", fields: [restaurantUserID], references: [id])
@@ -243,6 +253,7 @@ model hr_payroll_data {
   employerESI                     Int                              @default(0)
   houseRentAllowance              Int
   otherAllowances                 Int
+  isDeleted                       Boolean                          @default(false)
   document_uploads_tracking_table document_uploads_tracking_table? @relation(fields: [documentUploadTrackingTableID], references: [id])
   restaurant                      restaurant?                      @relation(fields: [restaurantID], references: [id])
 }
@@ -261,6 +272,7 @@ model non_cahrgable_items {
   createdByUserID                                                         String?
   updatedByUserID                                                         String?
   approvedByUserID                                                        String?
+  isDeleted                                                               Boolean                      @default(false)
   restaurant_SKU_item_variants                                            restaurant_SKU_item_variants @relation(fields: [SKUItemVariantID], references: [id])
   restaurant_users_non_cahrgable_items_approvedByUserIDTorestaurant_users restaurant_users?            @relation("non_cahrgable_items_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_non_cahrgable_items_createdByUserIDTorestaurant_users  restaurant_users?            @relation("non_cahrgable_items_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
@@ -276,6 +288,7 @@ model non_chargable_category {
   createdByUserID                                                            String?
   updatedByUserID                                                            String?
   approvedByUserID                                                           String?
+  isDeleted                                                                  Boolean           @default(false)
   restaurant_users_non_chargable_category_approvedByUserIDTorestaurant_users restaurant_users? @relation("non_chargable_category_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_non_chargable_category_createdByUserIDTorestaurant_users  restaurant_users? @relation("non_chargable_category_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_users_non_chargable_category_updatedByUserIDTorestaurant_users  restaurant_users? @relation("non_chargable_category_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id])
@@ -289,6 +302,9 @@ model non_chargeable_sale_categories {
   createdAt                                                                          DateTime                  @default(now())
   updatedAt                                                                          DateTime
   nonChargeableSaleCategoryName                                                      String
+  isDeleted                                                                          Boolean                   @default(false)
+  approvalStatus                                                                     Boolean                   @default(false)
+  enabled                                                                            Boolean                   @default(false)
   restaurant_users_non_chargeable_sale_categories_approvedByUserIDTorestaurant_users restaurant_users?         @relation("non_chargeable_sale_categories_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
   restaurant_users_non_chargeable_sale_categories_createdByUserIDTorestaurant_users  restaurant_users?         @relation("non_chargeable_sale_categories_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
   restaurant_users_non_chargeable_sale_categories_updatedByUserIDTorestaurant_users  restaurant_users?         @relation("non_chargeable_sale_categories_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id], onDelete: Cascade)
@@ -311,6 +327,7 @@ model non_chargeable_sales {
   approvedByUserID                                                         String?
   createdAt                                                                DateTime                       @default(now())
   updatedAt                                                                DateTime
+  isDeleted                                                                Boolean                        @default(false)
   restaurant_users_non_chargeable_sales_approvedByUserIDTorestaurant_users restaurant_users?              @relation("non_chargeable_sales_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
   restaurant_users_non_chargeable_sales_createdByUserIDTorestaurant_users  restaurant_users?              @relation("non_chargeable_sales_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
   non_chargeable_sale_categories                                           non_chargeable_sale_categories @relation(fields: [nonChargeableSaleCategoryID], references: [id])
@@ -333,6 +350,7 @@ model non_chargeable_sales_entries {
   createdAt                                                                        DateTime             @default(now())
   updatedAt                                                                        DateTime
   amount                                                                           Int                  @default(0)
+  isDeleted                                                                        Boolean              @default(false)
   restaurant_users_non_chargeable_sales_entries_approvedByUserIDTorestaurant_users restaurant_users?    @relation("non_chargeable_sales_entries_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
   restaurant_users_non_chargeable_sales_entries_createdByUserIDTorestaurant_users  restaurant_users?    @relation("non_chargeable_sales_entries_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
   non_chargeable_sales                                                             non_chargeable_sales @relation(fields: [ncItemSalesID], references: [id])
@@ -513,6 +531,7 @@ model restaurant {
   chefID                                                     String?
   restaurantCode                                             String                            @unique
   storeID                                                    String?
+  isDeleted                                                  Boolean                           @default(false)
   document_uploads_tracking_table                            document_uploads_tracking_table[]
   hr_payroll_data                                            hr_payroll_data[]
   restaurant_users_restaurant_chefIDTorestaurant_users       restaurant_users?                 @relation("restaurant_chefIDTorestaurant_users", fields: [chefID], references: [id])
@@ -535,6 +554,7 @@ model restaurant_SKU_category {
   createdByUserID                                                             String?
   updatedByUserID                                                             String?
   approvedByUserID                                                            String?
+  isDeleted                                                                   Boolean                                     @default(false)
   permanent_item_report_with_customer_order                                   permanent_item_report_with_customer_order[]
   restaurant_users_restaurant_SKU_category_approvedByUserIDTorestaurant_users restaurant_users?                           @relation("restaurant_SKU_category_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_restaurant_SKU_category_createdByUserIDTorestaurant_users  restaurant_users?                           @relation("restaurant_SKU_category_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
@@ -553,6 +573,7 @@ model restaurant_SKU_groups {
   createdByUserID                                                           String?
   updatedByUserID                                                           String?
   approvedByUserID                                                          String?
+  isDeleted                                                                 Boolean                @default(false)
   restaurant_users_restaurant_SKU_groups_approvedByUserIDTorestaurant_users restaurant_users?      @relation("restaurant_SKU_groups_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_restaurant_SKU_groups_createdByUserIDTorestaurant_users  restaurant_users?      @relation("restaurant_SKU_groups_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_users_restaurant_SKU_groups_updatedByUserIDTorestaurant_users  restaurant_users?      @relation("restaurant_SKU_groups_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id])
@@ -574,6 +595,7 @@ model restaurant_SKU_item_variants {
   createdByUserID                                                                  String?
   updatedByUserID                                                                  String?
   approvedByUserID                                                                 String?
+  isDeleted                                                                        Boolean                                     @default(false)
   non_cahrgable_items                                                              non_cahrgable_items?
   non_chargeable_sales                                                             non_chargeable_sales[]
   permanent_item_report_with_customer_order                                        permanent_item_report_with_customer_order[]
@@ -598,6 +620,7 @@ model restaurant_SKU_items {
   approvedByUserID                                                         String?
   restaurantSKUCategoryID                                                  String
   restaurantSKUGroupID                                                     String?
+  isDeleted                                                                Boolean                        @default(false)
   restaurant_SKU_item_variants                                             restaurant_SKU_item_variants[]
   restaurant_users_restaurant_SKU_items_approvedByUserIDTorestaurant_users restaurant_users?              @relation("restaurant_SKU_items_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_restaurant_SKU_items_createdByUserIDTorestaurant_users  restaurant_users?              @relation("restaurant_SKU_items_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
@@ -616,6 +639,7 @@ model restaurant_expense_category {
   createdByUserID                                                                 String?
   updatedByUserID                                                                 String?
   approvedByUserID                                                                String?
+  isDeleted                                                                       Boolean               @default(false)
   restaurant_users_restaurant_expense_category_approvedByUserIDTorestaurant_users restaurant_users?     @relation("restaurant_expense_category_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_restaurant_expense_category_createdByUserIDTorestaurant_users  restaurant_users?     @relation("restaurant_expense_category_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_users_restaurant_expense_category_updatedByUserIDTorestaurant_users  restaurant_users?     @relation("restaurant_expense_category_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id])
@@ -636,6 +660,7 @@ model restaurant_expenses {
   updatedByUserID                                                         String?
   approvedByUserID                                                        String?
   restaurantID                                                            String
+  isDeleted                                                               Boolean                     @default(false)
   restaurant_users_restaurant_expenses_approvedByUserIDTorestaurant_users restaurant_users?           @relation("restaurant_expenses_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_restaurant_expenses_createdByUserIDTorestaurant_users  restaurant_users?           @relation("restaurant_expenses_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_expense_category                                             restaurant_expense_category @relation(fields: [restaurantExpenseCategoryID], references: [id])
@@ -654,6 +679,7 @@ model restaurant_issued_items {
   issueDate                     String
   purchaseId                    String?
   storeSKUSectionID             String?
+  isDeleted                     Boolean                       @default(false)
   store_purchase                store_purchase?               @relation(fields: [purchaseId], references: [id])
   restaurant_recquisition_items restaurant_recquisition_items @relation(fields: [restaurantRecquisitionItemID], references: [id])
   restaurant_issues             restaurant_issues?            @relation(fields: [restaurant_issuesId], references: [id])
@@ -670,6 +696,7 @@ model restaurant_issues {
   createdByUserID                                                       String?
   updatedByUserID                                                       String?
   approvedByUserID                                                      String?
+  isDeleted                                                             Boolean                   @default(false)
   restaurant_issued_items                                               restaurant_issued_items[]
   restaurant_users_restaurant_issues_approvedByUserIDTorestaurant_users restaurant_users?         @relation("restaurant_issues_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_restaurant_issues_createdByUserIDTorestaurant_users  restaurant_users?         @relation("restaurant_issues_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
@@ -679,51 +706,59 @@ model restaurant_issues {
 
 model restaurant_new_SKU_group {
   group_category_id BigInt
-  g_name            String
   restaurant_id     Int
   id                String                     @id @default(uuid())
+  group_name        String
   newRestaurant     newRestaurant              @relation(fields: [restaurant_id], references: [restaurant_id])
   item              restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_category {
-  c_id                    BigInt
-  c_name                  String
-  restaurant_id           Int
-  isBuffet                Boolean?
-  meal_type               MealType?
-  id                      String                     @id @default(uuid())
-  non_chargeable_sales_v2 non_chargeable_sales_v2[]
-  newRestaurant           newRestaurant              @relation(fields: [restaurant_id], references: [restaurant_id])
-  item                    restaurant_new_SKU_items[]
+  restaurant_id                   Int
+  isBuffet                        String?
+  id                              String                            @id @default(uuid())
+  meal_type                       String?
+  buffetTypeId                    String?
+  mealTypeId                      String?
+  category_id                     BigInt
+  category_name                   String
+  non_chargeable_sales_entries_v2 non_chargeable_sales_entries_v2[]
+  non_chargeable_sales_v2         non_chargeable_sales_v2[]
+  buffetType                      buffetType?                       @relation(fields: [buffetTypeId], references: [id])
+  mealType                        mealType?                         @relation(fields: [mealTypeId], references: [id])
+  newRestaurant                   newRestaurant                     @relation(fields: [restaurant_id], references: [restaurant_id])
+  restaurant_new_SKU_items        restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_variants {
-  v_id   BigInt
-  v_name String?
-  id     String                     @id  @default(uuid())
-  item   restaurant_new_SKU_items[]
+  id                       String                     @id @default(uuid())
+  variant_id               BigInt
+  variant_name             String?
+  restaurant_new_SKU_items restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_items {
-  item_id                 BigInt
-  price                   Int
-  name                    String
-  old_item_id             BigInt?
-  i_s_name                String?
-  c_id                    String?
-  group_category_id       String?
-  v_id                    String?
-  restaurant_id           Int
-  isAdult                 Boolean?
-  isVeg                   Boolean?
-  id                      String                       @id  @default(uuid())
-  OrderItem               OrderItem[]
-  non_chargeable_sales_v2 non_chargeable_sales_v2[]
-  category                restaurant_new_SKU_category? @relation(fields: [c_id], references: [id])
-  sku_group               restaurant_new_SKU_group?    @relation(fields: [group_category_id], references: [id])
-  newRestaurant           newRestaurant                @relation(fields: [restaurant_id], references: [restaurant_id])
-  varient                 restaurant_new_SKU_variants? @relation(fields: [v_id], references: [id])
+  item_id                         BigInt
+  price                           Int
+  name                            String
+  old_item_id                     BigInt?
+  i_s_name                        String?
+  group_category_id               String?
+  restaurant_id                   Int
+  isAdult                         String?
+  isVeg                           String?
+  id                              String                            @id @default(uuid())
+  category_id                     String?
+  variant_id                      String?
+  OrderItem                       OrderItem[]
+  non_chargeable_sales_entries_v2 non_chargeable_sales_entries_v2[]
+  non_chargeable_sales_v2         non_chargeable_sales_v2[]
+  restaurant_new_SKU_category     restaurant_new_SKU_category?      @relation(fields: [category_id], references: [id])
+  sku_group                       restaurant_new_SKU_group?         @relation(fields: [group_category_id], references: [id])
+  customerType                    customerType?                     @relation(fields: [isAdult], references: [id])
+  vegetarianMark                  vegetarianMark?                   @relation(fields: [isVeg], references: [id])
+  newRestaurant                   newRestaurant                     @relation(fields: [restaurant_id], references: [restaurant_id])
+  restaurant_new_SKU_variants     restaurant_new_SKU_variants?      @relation(fields: [variant_id], references: [id])
 }
 
 model restaurant_permissions {
@@ -733,6 +768,7 @@ model restaurant_permissions {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime
   enabled              Boolean            @default(true)
+  isDeleted            Boolean            @default(false)
   restaurant_roles     restaurant_roles[] @relation("restaurant_permissionsTorestaurant_roles")
 }
 
@@ -747,6 +783,7 @@ model restaurant_recquisition_items {
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime
   restaurantRecquisitionID String
+  isDeleted                Boolean                   @default(false)
   restaurant_issued_items  restaurant_issued_items[]
   store_SKU_item_variants  store_SKU_item_variants?  @relation(fields: [SKUItemVariantID], references: [id])
   restaurant_recquisitions restaurant_recquisitions  @relation(fields: [restaurantRecquisitionID], references: [id])
@@ -761,6 +798,7 @@ model restaurant_recquisitions {
   createdByUserID                                                              String?
   updatedByUserID                                                              String?
   approvedByUserID                                                             String?
+  isDeleted                                                                    Boolean                         @default(false)
   restaurant_issues                                                            restaurant_issues[]
   restaurant_recquisition_items                                                restaurant_recquisition_items[]
   restaurant_users_restaurant_recquisitions_approvedByUserIDTorestaurant_users restaurant_users?               @relation("restaurant_recquisitions_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
@@ -775,6 +813,7 @@ model restaurant_roles {
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime
   enabled                Boolean                  @default(true)
+  isDeleted              Boolean                  @default(false)
   restaurant_users       restaurant_users[]
   restaurant_permissions restaurant_permissions[] @relation("restaurant_permissionsTorestaurant_roles")
 }
@@ -804,6 +843,7 @@ model restaurant_users {
   createdBy                                                                                          String?
   updatedBy                                                                                          String?
   userType                                                                                           String                            @default("restaurant")
+  isDeleted                                                                                          Boolean                           @default(false)
   document_uploads_tracking_table                                                                    document_uploads_tracking_table[]
   gas_readings_gas_readings_approvedByUserIDTorestaurant_users                                       gas_readings[]                    @relation("gas_readings_approvedByUserIDTorestaurant_users")
   gas_readings_gas_readings_createdByUserIDTorestaurant_users                                        gas_readings[]                    @relation("gas_readings_createdByUserIDTorestaurant_users")
@@ -900,6 +940,7 @@ model store_SKU_category {
   updatedByUserID                                                        String?
   approvedByUserID                                                       String?
   isPerishable                                                           Boolean
+  isDeleted                                                              Boolean              @default(false)
   restaurant_users_store_SKU_category_approvedByUserIDTorestaurant_users restaurant_users?    @relation("store_SKU_category_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_store_SKU_category_createdByUserIDTorestaurant_users  restaurant_users?    @relation("store_SKU_category_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_users_store_SKU_category_updatedByUserIDTorestaurant_users  restaurant_users?    @relation("store_SKU_category_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id])
@@ -921,7 +962,9 @@ model store_SKU_item_variants {
   createdByUserID                                                             String?
   updatedByUserID                                                             String?
   approvedByUserID                                                            String?
+  isDeleted                                                                   Boolean                                  @default(false)
   non_chargeable_sales                                                        non_chargeable_sales[]
+  non_chargeable_sales_entries_v2                                             non_chargeable_sales_entries_v2[]
   non_chargeable_sales_v2                                                     non_chargeable_sales_v2[]
   restaurant_recquisition_items                                               restaurant_recquisition_items[]
   store_SKU_items                                                             store_SKU_items                          @relation(fields: [SKUItemID], references: [id])
@@ -943,6 +986,7 @@ model store_SKU_item_variants_purchase_rates {
   updatedAt               DateTime
   remarks                 String?
   vendorID                String
+  isDeleted               Boolean                 @default(false)
   store_SKU_item_variants store_SKU_item_variants @relation(fields: [SKUItemVariantID], references: [id])
   vendors                 vendors                 @relation(fields: [vendorID], references: [id])
 }
@@ -959,6 +1003,7 @@ model store_SKU_items {
   updatedByUserID                                                     String?
   approvedByUserID                                                    String?
   storeSKUSectionID                                                   String
+  isDeleted                                                           Boolean                   @default(false)
   store_SKU_item_variants                                             store_SKU_item_variants[]
   restaurant_users_store_SKU_items_approvedByUserIDTorestaurant_users restaurant_users?         @relation("store_SKU_items_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_store_SKU_items_createdByUserIDTorestaurant_users  restaurant_users?         @relation("store_SKU_items_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
@@ -977,6 +1022,7 @@ model store_SKU_sections {
   createdByUserID                                                        String?
   updatedByUserID                                                        String?
   approvedByUserID                                                       String?
+  isDeleted                                                              Boolean                   @default(false)
   restaurant_issued_items                                                restaurant_issued_items[]
   store_SKU_items                                                        store_SKU_items[]
   restaurant_users_store_SKU_sections_approvedByUserIDTorestaurant_users restaurant_users?         @relation("store_SKU_sections_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
@@ -987,14 +1033,15 @@ model store_SKU_sections {
 
 model store_inventory {
   id                      String                    @id
-  restaurandUserID        String
+  restaurandUserID        String?
   storeInventoryQuantity  String
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime
   SKUItemVariantID        String                    @unique
   restaurantId            String?
+  isDeleted               Boolean                   @default(false)
   store_SKU_item_variants store_SKU_item_variants   @relation(fields: [SKUItemVariantID], references: [id])
-  restaurant_users        restaurant_users          @relation(fields: [restaurandUserID], references: [id])
+  restaurant_users        restaurant_users?         @relation(fields: [restaurandUserID], references: [id])
   restaurant              restaurant?               @relation(fields: [restaurantId], references: [id])
   store_inventory_details store_inventory_details[]
 }
@@ -1010,15 +1057,16 @@ model store_inventory_details {
   closingQuantity   Int
   createdAt         DateTime        @default(now())
   updatedAt         DateTime
+  isDeleted         Boolean         @default(false)
   store_inventory   store_inventory @relation(fields: [storeInventoryId], references: [id])
 }
 
 model store_purchase {
   id                      String                    @id
-  restaurandID            String?
+  restaurantID            String?
   vendorID                String
   storeSKUItemVariantsID  String
-  storePurcuaseRate       Int
+  storePurchaseRate       Int
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime
   restaurantUserID        String?
@@ -1030,6 +1078,8 @@ model store_purchase {
   openingQuantity         Int                       @default(0)
   storePurchaseAmount     Int
   storePurchaseQuantity   Int
+  isDeleted               Boolean                   @default(false)
+  totalWasted             Int                       @default(0)
   restaurant_issued_items restaurant_issued_items[]
   restaurant_users        restaurant_users?         @relation(fields: [restaurantUserID], references: [id])
   store_SKU_item_variants store_SKU_item_variants   @relation(fields: [storeSKUItemVariantsID], references: [id])
@@ -1045,6 +1095,7 @@ model store_purchase_entries {
   storePurchaseAmount   Int?
   createdAt             DateTime       @default(now())
   updatedAt             DateTime
+  isDeleted             Boolean        @default(false)
   store_purchase        store_purchase @relation(fields: [purchaseId], references: [id])
 }
 
@@ -1166,6 +1217,7 @@ model unit_expenses_tally_data {
   createdAt                       DateTime                         @default(now())
   updatedAt                       DateTime
   expenseType                     String
+  isDeleted                       Boolean                          @default(false)
   document_uploads_tracking_table document_uploads_tracking_table? @relation(fields: [documentUploadTrackingTableID], references: [id])
   expense_tally_data_categories   expense_tally_data_categories    @relation(fields: [expenseCategoryID], references: [id])
   restaurant                      restaurant?                      @relation(fields: [restaurantID], references: [id])
@@ -1181,6 +1233,7 @@ model vendor_categories {
   createdByUserID                                                       String?
   updatedByUserID                                                       String?
   approvedByUserID                                                      String?
+  isDeleted                                                             Boolean           @default(false)
   restaurant_users_vendor_categories_approvedByUserIDTorestaurant_users restaurant_users? @relation("vendor_categories_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
   restaurant_users_vendor_categories_createdByUserIDTorestaurant_users  restaurant_users? @relation("vendor_categories_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
   restaurant_users_vendor_categories_updatedByUserIDTorestaurant_users  restaurant_users? @relation("vendor_categories_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id], onDelete: Cascade)
@@ -1205,6 +1258,7 @@ model vendors {
   createdAt                                                   DateTime                                 @default(now())
   updatedAt                                                   DateTime
   enabled                                                     Boolean                                  @default(true)
+  isDeleted                                                   Boolean                                  @default(false)
   store_SKU_item_variants_purchase_rates                      store_SKU_item_variants_purchase_rates[]
   store_purchase                                              store_purchase[]
   restaurant_users_vendors_approvedByUserIDTorestaurant_users restaurant_users?                        @relation("vendors_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
@@ -1224,6 +1278,7 @@ model waste_management_category {
   createdByUserID                                                               String?
   updatedByUserID                                                               String?
   approvedByUserID                                                              String?
+  isDeleted                                                                     Boolean                  @default(false)
   restaurant_users_waste_management_category_approvedByUserIDTorestaurant_users restaurant_users?        @relation("waste_management_category_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   restaurant_users_waste_management_category_createdByUserIDTorestaurant_users  restaurant_users?        @relation("waste_management_category_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
   restaurant_users_waste_management_category_updatedByUserIDTorestaurant_users  restaurant_users?        @relation("waste_management_category_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id])
@@ -1243,6 +1298,7 @@ model waste_management_items {
   updatedByUserID                                                            String?
   approvedByUserID                                                           String?
   categoryID                                                                 String?
+  isDeleted                                                                  Boolean                       @default(false)
   restaurant_users_waste_management_items_approvedByUserIDTorestaurant_users restaurant_users?             @relation("waste_management_items_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id])
   waste_management_category                                                  waste_management_category?    @relation(fields: [categoryID], references: [id])
   restaurant_users_waste_management_items_createdByUserIDTorestaurant_users  restaurant_users?             @relation("waste_management_items_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id])
@@ -1268,7 +1324,7 @@ model zomato {
 }
 
 model non_chargeable_sales_entries_v2 {
-  id                                                                                  String                  @id
+  id                                                                                  String                       @id
   ncItemSalesID                                                                       String
   date                                                                                String
   quantity                                                                            Int
@@ -1277,13 +1333,21 @@ model non_chargeable_sales_entries_v2 {
   approvedByUserID                                                                    String?
   trailedByUser                                                                       String?
   reason                                                                              String?
-  createdAt                                                                           DateTime                @default(now())
+  createdAt                                                                           DateTime                     @default(now())
   updatedAt                                                                           DateTime
-  amount                                                                              Int                     @default(0)
-  restaurant_users_non_chargeable_sales_entries_v2_approvedByUserIDTorestaurant_users restaurant_users?       @relation("non_chargeable_sales_entries_v2_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
-  restaurant_users_non_chargeable_sales_entries_v2_createdByUserIDTorestaurant_users  restaurant_users?       @relation("non_chargeable_sales_entries_v2_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
-  non_chargeable_sales_v2                                                             non_chargeable_sales_v2 @relation(fields: [ncItemSalesID], references: [id])
-  restaurant_users_non_chargeable_sales_entries_v2_updatedByUserIDTorestaurant_users  restaurant_users?       @relation("non_chargeable_sales_entries_v2_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id], onDelete: Cascade)
+  amount                                                                              Int                          @default(0)
+  isDeleted                                                                           Boolean                      @default(false)
+  restaurantSKUItemID                                                                 String?
+  restaurant_new_SKU_categoryC_id                                                     String?
+  storeSKUItemVarintID                                                                String?
+  rate                                                                                Int                          @default(0)
+  restaurant_users_non_chargeable_sales_entries_v2_approvedByUserIDTorestaurant_users restaurant_users?            @relation("non_chargeable_sales_entries_v2_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
+  restaurant_users_non_chargeable_sales_entries_v2_createdByUserIDTorestaurant_users  restaurant_users?            @relation("non_chargeable_sales_entries_v2_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
+  non_chargeable_sales_v2                                                             non_chargeable_sales_v2      @relation(fields: [ncItemSalesID], references: [id])
+  restaurant_new_SKU_items                                                            restaurant_new_SKU_items?    @relation(fields: [restaurantSKUItemID], references: [id])
+  restaurant_new_SKU_category                                                         restaurant_new_SKU_category? @relation(fields: [restaurant_new_SKU_categoryC_id], references: [id])
+  store_SKU_item_variants                                                             store_SKU_item_variants?     @relation(fields: [storeSKUItemVarintID], references: [id])
+  restaurant_users_non_chargeable_sales_entries_v2_updatedByUserIDTorestaurant_users  restaurant_users?            @relation("non_chargeable_sales_entries_v2_updatedByUserIDTorestaurant_users", fields: [updatedByUserID], references: [id], onDelete: Cascade)
 }
 
 model non_chargeable_sales_v2 {
@@ -1302,6 +1366,7 @@ model non_chargeable_sales_v2 {
   createdAt                                                                   DateTime                          @default(now())
   updatedAt                                                                   DateTime
   restaurant_new_SKU_categoryC_id                                             String?
+  isDeleted                                                                   Boolean                           @default(false)
   non_chargeable_sales_entries_v2                                             non_chargeable_sales_entries_v2[]
   restaurant_users_non_chargeable_sales_v2_approvedByUserIDTorestaurant_users restaurant_users?                 @relation("non_chargeable_sales_v2_approvedByUserIDTorestaurant_users", fields: [approvedByUserID], references: [id], onDelete: Cascade)
   restaurant_users_non_chargeable_sales_v2_createdByUserIDTorestaurant_users  restaurant_users?                 @relation("non_chargeable_sales_v2_createdByUserIDTorestaurant_users", fields: [createdByUserID], references: [id], onDelete: Cascade)
@@ -1314,10 +1379,40 @@ model non_chargeable_sales_v2 {
 
 model newRestaurant {
   restaurant_id               Int                           @id @unique
+  isDeleted                   Boolean                       @default(false)
   Order                       Order[]
+  OrderItem                   OrderItem[]
   restaurant_new_SKU_category restaurant_new_SKU_category[]
   restaurant_new_SKU_group    restaurant_new_SKU_group[]
   restaurant_new_SKU_items    restaurant_new_SKU_items[]
+}
+
+model buffetType {
+  id                          String                        @id
+  buffetTypeName              String
+  enabled                     Boolean
+  restaurant_new_SKU_category restaurant_new_SKU_category[]
+}
+
+model customerType {
+  id                       String                     @id
+  customerTypeName         String
+  enabled                  Boolean
+  restaurant_new_SKU_items restaurant_new_SKU_items[]
+}
+
+model mealType {
+  id                          String                        @id
+  mealTypeName                String
+  enabled                     Boolean
+  restaurant_new_SKU_category restaurant_new_SKU_category[]
+}
+
+model vegetarianMark {
+  id                       String                     @id
+  vegetarianMarkType       String
+  enabled                  Boolean
+  restaurant_new_SKU_items restaurant_new_SKU_items[]
 }
 
 enum Category {
@@ -1392,10 +1487,4 @@ enum OrderTypeEnum {
   dine_in
   delivery
   pickup
-}
-
-enum MealType {
-  DINNER
-  LUNCH
-  NOT_APPLICABLE
 }
