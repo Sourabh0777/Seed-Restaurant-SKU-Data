@@ -51,6 +51,7 @@ model Order {
   SGST                   Float?
   VAT                    Float?
   createdAt              DateTime
+  paymentType            String?
   newRestaurant          newRestaurant @relation(fields: [restaurantID], references: [restaurant_id])
   OrderItem              OrderItem[]
 }
@@ -59,7 +60,7 @@ model OrderItem {
   id                       Int                       @id @unique @default(autoincrement())
   orderID                  Int
   quantity                 Int?
-  createdAt                DateTime                  @default(now())
+  createdAt                DateTime
   NCFlag                   Boolean                   @default(false)
   item_id                  String?
   original_price           Float?
@@ -68,6 +69,7 @@ model OrderItem {
   total_discount           Float?                    @default(0)
   total_tax                Float?
   restaurantID             Int
+  packingCharge            Int                       @default(0)
   restaurant_new_SKU_items restaurant_new_SKU_items? @relation(fields: [item_id], references: [id])
   Order                    Order                     @relation(fields: [orderID], references: [id])
   newRestaurant            newRestaurant             @relation(fields: [restaurantID], references: [restaurant_id])
