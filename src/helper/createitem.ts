@@ -12,10 +12,10 @@ export const createItem = async (data: any) => {
             return;
           }
           // Create Restaurant
-          let findRestaurant = await prisma.newRestaurant.findUnique({ where: { restaurant_id: parseInt(item.restaurant_id) } });
+          let findRestaurant = await prisma.new_restaurant.findUnique({ where: { restaurant_id: parseInt(item.restaurant_id) } });
           let createRestaurant;
           if (!findRestaurant) {
-            createRestaurant = await prisma.newRestaurant.create({ data: { restaurant_id: parseInt(item.restaurant_id) } });
+            createRestaurant = await prisma.new_restaurant.create({ data: { restaurant_id: parseInt(item.restaurant_id) } });
           }
           const restaurantId = findRestaurant?.restaurant_id || createRestaurant?.restaurant_id;
           if (!restaurantId) {

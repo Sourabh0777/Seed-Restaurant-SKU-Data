@@ -1,2 +1,1 @@
-export const mealTypes=["lunch","dinner", "not_applicable"]
-
+export const meal_types = [];

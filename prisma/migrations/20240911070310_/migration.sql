@@ -1244,11 +1244,11 @@ CREATE TABLE "non_chargeable_sales_v2" (
 );
 
 -- CreateTable
-CREATE TABLE "newRestaurant" (
+CREATE TABLE "new_restaurant" (
     "restaurant_id" INTEGER NOT NULL,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "newRestaurant_pkey" PRIMARY KEY ("restaurant_id")
+    CONSTRAINT "new_restaurant_pkey" PRIMARY KEY ("restaurant_id")
 );
 
 -- CreateTable
@@ -1417,7 +1417,7 @@ CREATE UNIQUE INDEX "vendors_vendorName_key" ON "vendors"("vendorName");
 CREATE UNIQUE INDEX "waste_management_category_wasteManagementCategoryName_key" ON "waste_management_category"("wasteManagementCategoryName");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "newRestaurant_restaurant_id_key" ON "newRestaurant"("restaurant_id");
+CREATE UNIQUE INDEX "new_restaurant_restaurant_id_key" ON "new_restaurant"("restaurant_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_admin_permissionsToadmin_roles_AB_unique" ON "_admin_permissionsToadmin_roles"("A", "B");
@@ -1432,7 +1432,7 @@ CREATE UNIQUE INDEX "_restaurant_permissionsTorestaurant_roles_AB_unique" ON "_r
 CREATE INDEX "_restaurant_permissionsTorestaurant_roles_B_index" ON "_restaurant_permissionsTorestaurant_roles"("B");
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_restaurantID_fkey" FOREIGN KEY ("restaurantID") REFERENCES "newRestaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_restaurantID_fkey" FOREIGN KEY ("restaurantID") REFERENCES "new_restaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_item_id_fkey" FOREIGN KEY ("item_id") REFERENCES "restaurant_new_SKU_items"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1441,7 +1441,7 @@ ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_item_id_fkey" FOREIGN KEY ("it
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderID_fkey" FOREIGN KEY ("orderID") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_restaurantID_fkey" FOREIGN KEY ("restaurantID") REFERENCES "newRestaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_restaurantID_fkey" FOREIGN KEY ("restaurantID") REFERENCES "new_restaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "admin_users" ADD CONSTRAINT "admin_users_admin_rolesId_fkey" FOREIGN KEY ("admin_rolesId") REFERENCES "admin_roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1672,7 +1672,7 @@ ALTER TABLE "restaurant_issues" ADD CONSTRAINT "restaurant_issues_restaurantRecq
 ALTER TABLE "restaurant_issues" ADD CONSTRAINT "restaurant_issues_updatedByUserID_fkey" FOREIGN KEY ("updatedByUserID") REFERENCES "restaurant_users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "restaurant_new_SKU_group" ADD CONSTRAINT "restaurant_new_SKU_group_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "newRestaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "restaurant_new_SKU_group" ADD CONSTRAINT "restaurant_new_SKU_group_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "new_restaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "restaurant_new_SKU_category" ADD CONSTRAINT "restaurant_new_SKU_category_buffetTypeId_fkey" FOREIGN KEY ("buffetTypeId") REFERENCES "buffetType"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1681,7 +1681,7 @@ ALTER TABLE "restaurant_new_SKU_category" ADD CONSTRAINT "restaurant_new_SKU_cat
 ALTER TABLE "restaurant_new_SKU_category" ADD CONSTRAINT "restaurant_new_SKU_category_mealTypeId_fkey" FOREIGN KEY ("mealTypeId") REFERENCES "mealType"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "restaurant_new_SKU_category" ADD CONSTRAINT "restaurant_new_SKU_category_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "newRestaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "restaurant_new_SKU_category" ADD CONSTRAINT "restaurant_new_SKU_category_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "new_restaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "restaurant_new_SKU_items" ADD CONSTRAINT "restaurant_new_SKU_items_c_id_fkey" FOREIGN KEY ("c_id") REFERENCES "restaurant_new_SKU_category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1696,7 +1696,7 @@ ALTER TABLE "restaurant_new_SKU_items" ADD CONSTRAINT "restaurant_new_SKU_items_
 ALTER TABLE "restaurant_new_SKU_items" ADD CONSTRAINT "restaurant_new_SKU_items_isVeg_fkey" FOREIGN KEY ("isVeg") REFERENCES "vegetarianMark"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "restaurant_new_SKU_items" ADD CONSTRAINT "restaurant_new_SKU_items_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "newRestaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "restaurant_new_SKU_items" ADD CONSTRAINT "restaurant_new_SKU_items_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "new_restaurant"("restaurant_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "restaurant_new_SKU_items" ADD CONSTRAINT "restaurant_new_SKU_items_v_id_fkey" FOREIGN KEY ("v_id") REFERENCES "restaurant_new_SKU_variants"("id") ON DELETE SET NULL ON UPDATE CASCADE;
