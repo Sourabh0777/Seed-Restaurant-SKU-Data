@@ -52,7 +52,7 @@ model Order {
   VAT                    Float?
   createdAt              DateTime
   paymentType            String?
-  new_restaurant          new_restaurant @relation(fields: [restaurantID], references: [restaurant_id])
+  new_restaurant         new_restaurant @relation(fields: [restaurantID], references: [restaurant_id])
   OrderItem              OrderItem[]
 }
 
@@ -72,7 +72,7 @@ model OrderItem {
   packingCharge            Int                       @default(0)
   restaurant_new_SKU_items restaurant_new_SKU_items? @relation(fields: [item_id], references: [id])
   Order                    Order                     @relation(fields: [orderID], references: [id])
-  new_restaurant            new_restaurant            @relation(fields: [restaurantID], references: [restaurant_id])
+  new_restaurant           new_restaurant            @relation(fields: [restaurantID], references: [restaurant_id])
 }
 
 model admin_permissions {
@@ -714,22 +714,22 @@ model restaurant_new_SKU_group {
   restaurant_id     Int
   id                String                     @id @default(uuid())
   group_name        String
-  new_restaurant     new_restaurant             @relation(fields: [restaurant_id], references: [restaurant_id])
+  new_restaurant    new_restaurant             @relation(fields: [restaurant_id], references: [restaurant_id])
   item              restaurant_new_SKU_items[]
 }
 
 model restaurant_new_SKU_category {
   restaurant_id                   Int
   id                              String                            @id @default(uuid())
-  meal_typeId                      String?
+  mealTypeId                      String?
   category_id                     BigInt
   category_name                   String
   buffetTypeId                    Int?
   non_chargeable_sales_entries_v2 non_chargeable_sales_entries_v2[]
   non_chargeable_sales_v2         non_chargeable_sales_v2[]
-  buffetType                      buffet_type?                      @relation(fields: [buffetTypeId], references: [id])
-  meal_type                        meal_type?                        @relation(fields: [meal_typeId], references: [id])
-  new_restaurant                   new_restaurant                    @relation(fields: [restaurant_id], references: [restaurant_id])
+  buffet_type                      buffet_type?                      @relation(fields: [buffetTypeId], references: [id])
+  meal_type                       meal_type?                        @relation(fields: [mealTypeId], references: [id])
+  new_restaurant                  new_restaurant                    @relation(fields: [restaurant_id], references: [restaurant_id])
   restaurant_new_SKU_items        restaurant_new_SKU_items[]
 }
 
@@ -760,7 +760,7 @@ model restaurant_new_SKU_items {
   sku_group                       restaurant_new_SKU_group?         @relation(fields: [group_category_id], references: [id])
   customerType                    customer_type?                    @relation(fields: [isAdult], references: [id])
   vegetarianMark                  vegetarian_mark?                  @relation(fields: [isVeg], references: [id])
-  new_restaurant                   new_restaurant                    @relation(fields: [restaurant_id], references: [restaurant_id])
+  new_restaurant                  new_restaurant                    @relation(fields: [restaurant_id], references: [restaurant_id])
   restaurant_new_SKU_variants     restaurant_new_SKU_variants?      @relation(fields: [variant_id], references: [id])
 }
 
@@ -1391,15 +1391,15 @@ model buffet_type {
 }
 
 model customer_type {
-  id                       String                     @id
+  id                       String                     @id @default(uuid())
   customerTypeName         String
   enabled                  Boolean                    @default(true)
   restaurant_new_SKU_items restaurant_new_SKU_items[]
 }
 
 model meal_type {
-  id                          String                        @id
-  meal_typeName                String
+  id                          String                        @id @default(uuid())
+  mealTypeName                String
   enabled                     Boolean                       @default(true)
   restaurant_new_SKU_category restaurant_new_SKU_category[]
 }
@@ -1414,7 +1414,7 @@ model new_restaurant {
 }
 
 model vegetarian_mark {
-  id                       String                     @id
+  id                       String                     @id @default(uuid())
   vegetarianMarkType       String
   enabled                  Boolean                    @default(true)
   restaurant_new_SKU_items restaurant_new_SKU_items[]

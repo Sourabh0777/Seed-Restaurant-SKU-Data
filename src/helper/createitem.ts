@@ -62,7 +62,17 @@ export const createItem = async (data: any) => {
           const itemExistsByName = await prisma.restaurant_new_SKU_items.findFirst({
             where: { restaurant_id: restaurantId, name: item.name },
           });
-
+          if (itemExistsById || itemExistsByName) {
+            const existingItem = itemExistsById || itemExistsByName;
+            if (existingItem && parseInt(item.price) !== existingItem.price) {
+              await prisma.restaurant_new_SKU_items.update({
+                where: { id: existingItem.id },
+                data: {
+                  price: parseInt(item.price),
+                },
+              });
+            }
+          }
           if (!itemExistsById && !itemExistsByName) {
             const createdItem = await prisma.restaurant_new_SKU_items.create({
               data: {
